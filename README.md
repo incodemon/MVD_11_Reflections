@@ -1,2 +1,2 @@
 ### La Salle - Universitat Ramon Llull : Master in Advanced Videogame Development
-## Engine Programming - 10-Optimisation
+## Advanced Graphics 1 - 11-Reflections, Skyboxes and Image-based Lighting
