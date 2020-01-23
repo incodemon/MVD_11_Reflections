@@ -47,10 +47,12 @@ void GraphicsSystem::update(float dt) {
     
 	updateAllCameras_();
     
+	
+
     for (auto &mesh : ECS.getAllComponents<Mesh>()) {
         renderMeshComponent_(mesh);
     }
-    
+	renderEnvironment_();
 }
 
 //renders a given mesh component
@@ -102,19 +104,34 @@ void GraphicsSystem::renderEnvironment_() {
     Camera& cam = ECS.getComponentInArray<Camera>(ECS.main_camera);
         
     //view projection matrix, zeroing out translation component of view matrix
-  
+	lm::mat4 view_matrix = cam.view_matrix;
+	view_matrix.m[12] = view_matrix.m[13] = view_matrix.m[14] = 0;
+	view_matrix.m[15] = 1;
+
+	lm::mat4 vp_matrix = cam.projection_matrix * view_matrix;
+
+	shader_->setUniform(U_VP, vp_matrix);
+
     //set vp uniform and texture
-    
+    //bind texture
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, environment_tex_);
+
     //bind texture environment_tex using GL_TEXTURE_CUBE_MAP
    
 	//no need to set sampler id, as it will default to 0
     
     // disable depth mask, cull front faces (to draw inside of mesh)
-    
+	glDepthMask(false);
+	glCullFace(GL_FRONT);
+
 	//draw cube_map_geom_
+	geometries_[cube_map_geom_].render();
+
 
     // reset depth mask and culling
-
+	glDepthMask(true);
+	glCullFace(GL_BACK);
     
 }
 
